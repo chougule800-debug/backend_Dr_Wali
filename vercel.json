@@ -1,0 +1,11 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "functions": {
+    "api/ai/transcribe.py": {
+      "maxDuration": 60
+    },
+    "api/ai/health.py": {
+      "maxDuration": 10
+    }
+  }
+}

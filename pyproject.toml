@@ -1,0 +1,17 @@
+[project]
+name = "neuro-specialities-ai"
+version = "0.1.0"
+description = "Python AI transcription service for Neuro Specialities (Groq Whisper)."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "Flask==3.0.3",
+    "requests==2.32.3",
+    "python-dotenv==1.0.1",
+]
+
+[tool.uv]
+# This project is not meant to be built/installed as a Python package.
+# It is a plain dependency-managed environment for the serverless API.
+# `uv sync` will install the deps into .venv without trying to build us.
+package = false
