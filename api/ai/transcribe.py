@@ -8,6 +8,11 @@ Forwards the audio to Groq Whisper via _ai_utils.transcribe_with_groq,
 validates and cleans the response, and returns a predictable JSON contract.
 
 Never exposes API keys. Never fabricates a transcript.
+
+CORS is enabled so the Next.js frontend can call this endpoint from a
+different origin (localhost dev, or a separate Vercel frontend project).
+The allowed origin is controlled by AI_ALLOWED_ORIGIN; defaults to "*"
+for local development.
 """
 
 import os
@@ -15,6 +20,7 @@ import sys
 import time
 
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 
 # Ensure the sibling _ai_utils.py in this directory is importable both
 # locally (uv run ...) and on Vercel (where the function is invoked
@@ -34,6 +40,24 @@ from _ai_utils import (  # noqa: E402
 
 
 app = Flask(__name__)
+
+# -----------------------------------------------------------------------------
+# CORS
+#
+# In production, set AI_ALLOWED_ORIGIN to the exact frontend origin,
+# e.g. AI_ALLOWED_ORIGIN=https://my-clinic.vercel.app
+# For local development the default "*" is fine.
+#
+# flask-cors automatically handles the OPTIONS preflight requests that
+# browsers send before a cross-origin POST with multipart/form-data.
+# -----------------------------------------------------------------------------
+_allowed_origin = os.environ.get("AI_ALLOWED_ORIGIN", "*").strip() or "*"
+CORS(
+    app,
+    resources={r"/*": {"origins": _allowed_origin}},
+    methods=["POST", "GET", "OPTIONS"],
+    allow_headers=["Content-Type"],
+)
 
 
 def _err(request_id, message, code, http_status):
